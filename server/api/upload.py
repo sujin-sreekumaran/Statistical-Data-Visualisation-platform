@@ -1,3 +1,4 @@
+import logging
 import matplotlib
 matplotlib.use('Agg') # Set the backend to 'Agg' to avoid GUI issues
 
@@ -7,8 +8,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import io
 from scipy.stats import skew, kurtosis
+from .visualizations import visualizations
 
 upload_bp = Blueprint('upload', __name__)
+
+# Configure logging
+logging.basicConfig(level=logging.ERROR)
+logger = logging.getLogger(__name__)
 
 @upload_bp.route('/upload', methods=['POST'])
 def upload_file():
@@ -27,27 +33,9 @@ def upload_file():
         fig, axes = plt.subplots(4, 1, figsize=(16, 24)) 
         # Increased width to 16 for better fit
         
-        # Visualization 1: Curve Plot
-        numeric_df = df.select_dtypes(include=['number'])
-        if not numeric_df.empty and numeric_df.shape[1] > 0:
-            axes[0].plot(numeric_df.index, numeric_df[numeric_df.columns[0]], label=numeric_df.columns[0])
-            axes[0].legend()
-            axes[0].set_title('Curve Plot')
-        
-        # Visualization 2: Histogram
-        if not numeric_df.empty and numeric_df.shape[1] > 0:
-            sns.histplot(numeric_df[numeric_df.columns[0]], ax=axes[1])
-            axes[1].set_title('Histogram')
-        
-        # Visualization 3: Box Plot
-        if not numeric_df.empty and numeric_df.shape[1] > 0:
-            sns.boxplot(data=numeric_df, ax=axes[2])
-            axes[2].set_title('Box Plot')
-        
-        # Visualization 4: Pair Plot
-        if not numeric_df.empty and numeric_df.shape[1] > 1:
-            sns.pairplot(numeric_df)
-            axes[3].set_title('Pair Plot')
+        # Apply visualizations
+        for i, (name, func) in enumerate(visualizations.items()):
+            func(df, axes[i])
         
         plt.tight_layout()
         
@@ -59,4 +47,5 @@ def upload_file():
         return send_file(img_io, mimetype='image/png')
     
     except Exception as e:
+        logger.error("Error processing file: %s", e, exc_info=True)
         return str(e), 500

@@ -23,12 +23,12 @@ const Modal = ({ isOpen, onClose, columns, handleColumnDelete, handleSubmit }) =
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
       <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl">
-        <h2 className="text-2xl font-bold mb-4">Edit Columns</h2>
+        <h2 className="text-2xl font-bold mb-4">Edit Column Names</h2>
         <table className="min-w-full bg-white">
           <thead>
             <tr>
-              <th className="py-2 px-4 border-b">Column Name</th>
-              <th className="py-2 px-4 border-b">Action</th>
+              <th className="py-2 px-4 border-b text-left">columns</th>
+              <th className="py-2 px-4 border-b text-left">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -45,7 +45,7 @@ const Modal = ({ isOpen, onClose, columns, handleColumnDelete, handleSubmit }) =
                 <td className="py-2 px-4 border-b">
                   <button
                     onClick={() => handleColumnDelete(col)}
-                    className="text-red-600 hover:text-red-800"
+                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700"
                   >
                     Delete
                   </button>
