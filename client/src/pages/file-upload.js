@@ -5,6 +5,7 @@ import Navbar from "../components/Navbar";
 import FileInput from "../components/FileInput";
 import GoogleSheetInput from "../components/GoogleSheetInput";
 import UploadButton from "../components/UploadButton";
+import Modal from "../components/Modal";
 
 export default function UploadFile() {
   const [state, setState] = useState({
@@ -18,6 +19,8 @@ export default function UploadFile() {
   const [isUploading, setIsUploading] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
   const [refreshTimer, setRefreshTimer] = useState(10);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [columns, setColumns] = useState([]);
   const refreshInterval = useRef(null);
   const router = useRouter();
 
@@ -127,8 +130,55 @@ export default function UploadFile() {
         return;
       }
     } else {
-      await uploadFile(state.file || state.csvFile);
+      const fileToUpload = state.file || state.csvFile;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target.result;
+        const csvData = text.split("\n")[0].split(",");
+        setColumns(csvData);
+        setIsModalOpen(true);
+      };
+      reader.readAsText(fileToUpload);
     }
+  };
+
+  const handleColumnDelete = (col) => {
+    setColumns(columns.filter((column) => column !== col));
+  };
+
+  const handleSubmit = async (editedColumns) => {
+    setIsModalOpen(false);
+    const fileToUpload = state.file || state.csvFile;
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const text = e.target.result;
+      const rows = text.split("\n");
+      const header = rows[0].split(",");
+      const columnMap = header.reduce((acc, col, index) => {
+        const newCol = editedColumns[index];
+        if (newCol) {
+          acc[index] = newCol;
+        }
+        return acc;
+      }, {});
+
+      const filteredRows = rows
+        .map((row, rowIndex) => {
+          const cells = row.split(",");
+          return cells
+            .filter((_, index) => columnMap[index] !== undefined)
+            .map((cell, index) => (rowIndex === 0 ? columnMap[index] : cell))
+            .join(",");
+        })
+        .join("\n");
+
+      console.log(filteredRows);
+
+      const blob = new Blob([filteredRows], { type: fileToUpload.type });
+      const newFile = new File([blob], fileToUpload.name, { type: fileToUpload.type });
+      await uploadFile(newFile);
+    };
+    reader.readAsText(fileToUpload);
   };
 
   const uploadFile = async (fileToUpload) => {
@@ -272,6 +322,14 @@ export default function UploadFile() {
           </div>
         </div>
       )}
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        columns={columns}
+        handleColumnDelete={handleColumnDelete}
+        handleSubmit={handleSubmit}
+      />
     </div>
   );
 }

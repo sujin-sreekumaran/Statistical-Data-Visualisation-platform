@@ -1,5 +1,5 @@
 import matplotlib
-matplotlib.use('Agg')  # Set the backend to 'Agg' to avoid GUI issues
+matplotlib.use('Agg') # Set the backend to 'Agg' to avoid GUI issues
 
 from flask import Blueprint, request, send_file
 import pandas as pd
@@ -24,7 +24,8 @@ def upload_file():
 
     try:
         # Create visualizations in a single column layout
-        fig, axes = plt.subplots(4, 1, figsize=(16, 24))  # Increased width to 16 for better fit
+        fig, axes = plt.subplots(4, 1, figsize=(16, 24)) 
+        # Increased width to 16 for better fit
         
         # Visualization 1: Curve Plot
         numeric_df = df.select_dtypes(include=['number'])
