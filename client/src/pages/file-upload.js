@@ -2,6 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
 import Navbar from "../components/Navbar";
+import FileInput from "../components/FileInput";
+import GoogleSheetInput from "../components/GoogleSheetInput";
+import UploadButton from "../components/UploadButton";
 
 export default function UploadFile() {
   const [state, setState] = useState({
@@ -202,118 +205,28 @@ export default function UploadFile() {
           <div className="px-6 py-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-6">Upload Your Data</h1>
 
-            {/* File Upload Section */}
-            <div className="flex items-center justify-center w-full mb-6">
-              <label
-                htmlFor="dropzone-file"
-                className={`flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 ${
-                  state.googleSheetLink ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-              >
-                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <svg
-                    className="w-10 h-10 mb-3 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                    ></path>
-                  </svg>
-                  <p className="mb-2 text-sm text-gray-500">
-                    <span className="font-semibold">Click to upload</span> or drag and drop
-                  </p>
-                  <p className="text-sm text-gray-500">CSV or Excel file</p>
-                  <p className="text-sm text-gray-500">
-                    Please make sure the data is already cleaned and preprocessed, Otherwise you
-                    will encounter some issues.
-                  </p>
-                </div>
-                <input
-                  id="dropzone-file"
-                  type="file"
-                  className="hidden"
-                  onChange={handleFileChange}
-                  accept=".csv,.xlsx"
-                  disabled={!!state.googleSheetLink}
-                />
-              </label>
-            </div>
+            <FileInput
+              handleFileChange={handleFileChange}
+              googleSheetLink={state.googleSheetLink}
+            />
             {state.file && (
               <p className="mt-4 text-sm text-gray-600">Uploaded file: {state.file.name}</p>
             )}
 
-            {/* Google Sheet Link Section */}
-            <div className="flex flex-col items-center justify-center w-full mb-6">
-              <label
-                htmlFor="google-sheet-link"
-                className="w-full text-lg text-gray-500 mb-2 font-semibold"
-              >
-                Paste Google Sheet Link
-                <br />
-                <p className="text-sm text-gray-500">
-                  Please make sure the sheet is shared with the public link.
-                </p>
-              </label>
+            <GoogleSheetInput
+              googleSheetLink={state.googleSheetLink}
+              handleGoogleSheetLinkChange={handleGoogleSheetLinkChange}
+              file={state.file}
+            />
 
-              <input
-                id="google-sheet-link"
-                type="text"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md"
-                placeholder="Eg: https://docs.google.com/spreadsheets/d/..."
-                value={state.googleSheetLink}
-                onChange={handleGoogleSheetLinkChange}
-                disabled={!!state.file}
-              />
-            </div>
-
-            <div className="flex space-x-4">
-              <button
-                onClick={handleUpload}
-                disabled={isUploading || (!state.file && !state.googleSheetLink)}
-                className="w-full px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isUploading ? (
-                  <div className="flex items-center justify-center">
-                    <svg
-                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    Uploading...
-                  </div>
-                ) : (
-                  "Upload"
-                )}
-              </button>
-              <button
-                onClick={handleReset}
-                disabled={!state.file && !state.googleSheetLink && !state.uploadedImage}
-                className="w-full px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Reset
-              </button>
-            </div>
+            <UploadButton
+              handleUpload={handleUpload}
+              isUploading={isUploading}
+              handleReset={handleReset}
+              file={state.file}
+              googleSheetLink={state.googleSheetLink}
+              uploadedImage={state.uploadedImage}
+            />
           </div>
         </div>
 
@@ -336,14 +249,12 @@ export default function UploadFile() {
         </div>
       )}
 
-      {/* Timer */}
       {state.csvFile && (
         <div className="fixed bottom-4 left-4 bg-blue-600 text-white px-4 py-2 rounded-md shadow-lg">
           Refreshing in {refreshTimer} seconds...
         </div>
       )}
 
-      {/* Toast Message */}
       {toastMessage && (
         <div className="fixed bottom-4 right-4 bg-red-600 text-white px-4 py-2 rounded-md shadow-lg">
           {toastMessage}
@@ -353,7 +264,6 @@ export default function UploadFile() {
         </div>
       )}
 
-      {/* Full-Screen Loader */}
       {state.isRefreshing && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
           <div className="flex flex-col items-center">
