@@ -127,6 +127,8 @@ export default function UploadFile() {
     formData.append("file", fileToUpload);
 
     try {
+      console.log("Uploading file...");
+
       const token = localStorage.getItem("token");
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_LOCAL_URL}/api/upload`,

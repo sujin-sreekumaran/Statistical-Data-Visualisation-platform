@@ -15,6 +15,14 @@ CORS(app)
 client = MongoClient(Config.MONGODB_URI)
 db = client[Config.MONGODB_DB]
 
+# Check database connection
+try:
+    # Attempt to list collections to check the connection
+    db.list_collection_names()
+    print("Successfully connected to the database.")
+except Exception as e:
+    print(f"Failed to connect to the database: {e}")
+
 # JWT configuration
 app.config['JWT_SECRET_KEY'] = Config.JWT_SECRET
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = Config.JWT_EXPIRATION_DELTA

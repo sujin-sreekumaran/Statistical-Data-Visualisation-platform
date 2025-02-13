@@ -1,3 +1,15 @@
+# Ignore .env files
 .venv
-
 .env
+server/.env
+client/.env
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+
+# Ignore other files and directories as needed
+node_modules/
+dist/
+build/
+.next

@@ -30,62 +30,32 @@ def upload_file():
         numeric_df = df.select_dtypes(include=['number'])
         if not numeric_df.empty and numeric_df.shape[1] > 0:
             axes[0].plot(numeric_df.index, numeric_df[numeric_df.columns[0]], label=numeric_df.columns[0])
-            axes[0].set_title('Curve Plot')
             axes[0].legend()
-        else:
-            axes[0].text(0.5, 0.5, 'Rows have non numeric data mixed with numeric data!!! for curve plot.', ha='center', va='center', fontsize=12)
             axes[0].set_title('Curve Plot')
-
-        # Visualization 2: Boxplot
+        
+        # Visualization 2: Histogram
         if not numeric_df.empty and numeric_df.shape[1] > 0:
-            sns.boxplot(data=numeric_df, ax=axes[1])
-            axes[1].set_title('Boxplot')
-        else:
-            axes[1].text(0.5, 0.5, 'Rows have non numeric data mixed with numeric data!!! for Boxplot', ha='center', va='center', fontsize=12)
-            axes[1].set_title('Boxplot')
-
-        # Visualization 3: Moments
+            sns.histplot(numeric_df[numeric_df.columns[0]], ax=axes[1])
+            axes[1].set_title('Histogram')
+        
+        # Visualization 3: Box Plot
         if not numeric_df.empty and numeric_df.shape[1] > 0:
-            moments_df = pd.DataFrame({
-                'Mean': numeric_df.mean(),
-                'Variance': numeric_df.var(),
-                'Skewness': numeric_df.apply(skew),
-                'Kurtosis': numeric_df.apply(kurtosis)
-            })
-            moments_df.plot(kind='bar', ax=axes[2])
-            axes[2].set_title('Moments of Mean, Variance, Skewness, and Kurtosis')
-            axes[2].set_ylabel('Value')
-            
-            # Rotate x-axis labels to be horizontal and adjust their position
-            axes[2].set_xticklabels(axes[2].get_xticklabels(), rotation=0, ha='center')
-            
-            # Adjust the bottom margin to prevent label cutoff
-            plt.tight_layout()
-            fig.subplots_adjust(bottom=0.1)
-            
-            # Optionally, you can adjust the figure size if needed
-            # fig.set_size_inches(18, 26)  # Increase height if labels are still cutoff
-        else:
-            axes[2].text(0.5, 0.5, 'Rows have non numeric data mixed with numeric data!!! for Moments Plot', ha='center', va='center', fontsize=12)
-            axes[2].set_title('Moments of Mean, Variance, Skewness, and Kurtosis')
-
-        # Visualization 4: Heatmap
-        if not numeric_df.empty:
-            sns.heatmap(numeric_df.corr(), annot=True, cmap='coolwarm', ax=axes[3])
-            axes[3].set_title('Correlation Heatmap')
-        else:
-            axes[3].text(0.5, 0.5, 'Rows have non numeric data mixed with numeric data!!! for Heatmap', ha='center', va='center', fontsize=12)
-            axes[3].set_title('Correlation Heatmap')
-
+            sns.boxplot(data=numeric_df, ax=axes[2])
+            axes[2].set_title('Box Plot')
+        
+        # Visualization 4: Pair Plot
+        if not numeric_df.empty and numeric_df.shape[1] > 1:
+            sns.pairplot(numeric_df)
+            axes[3].set_title('Pair Plot')
+        
         plt.tight_layout()
-
-        # Save the figure to a BytesIO object
-        img = io.BytesIO()
-        plt.savefig(img, format='png', bbox_inches='tight', dpi=300)  # Increase resolution for better quality
-        img.seek(0)
-       
-        # Return the image as a response
-        return send_file(img, mimetype='image/png')
+        
+        # Save the plot to a BytesIO object
+        img_io = io.BytesIO()
+        fig.savefig(img_io, format='png')
+        img_io.seek(0)
+        
+        return send_file(img_io, mimetype='image/png')
     
     except Exception as e:
         return str(e), 500
