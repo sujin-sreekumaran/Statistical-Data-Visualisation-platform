@@ -4,15 +4,17 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 
 export default function UploadFile() {
-  const [file, setFile] = useState(null);
+  const [state, setState] = useState({
+    file: null,
+    googleSheetLink: "",
+    uploadedImage: null,
+    error: null,
+    csvFile: null,
+    isRefreshing: false,
+  });
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadedImage, setUploadedImage] = useState(null);
-  const [error, setError] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
-  const [googleSheetLink, setGoogleSheetLink] = useState("");
-  const [csvFile, setCsvFile] = useState(null);
   const [refreshTimer, setRefreshTimer] = useState(10);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const refreshInterval = useRef(null);
   const router = useRouter();
 
@@ -21,15 +23,15 @@ export default function UploadFile() {
     if (!token) {
       router.push("/login");
     }
-  }, []);
+  }, [router]);
 
   useEffect(() => {
-    if (csvFile) {
+    if (state.csvFile) {
       startRefreshTimer();
     } else {
       stopRefreshTimer();
     }
-  }, [csvFile]);
+  }, [state.csvFile]);
 
   useEffect(() => {
     if (refreshTimer === 0) {
@@ -53,33 +55,39 @@ export default function UploadFile() {
   };
 
   const refetchGoogleSheetData = async () => {
-    if (googleSheetLink) {
-      setIsRefreshing(true);
+    if (state.googleSheetLink) {
+      setState({ ...state, isRefreshing: true });
       try {
-        const fetchedCsvFile = await fetchGoogleSheetAsCSV(googleSheetLink);
-        setCsvFile(fetchedCsvFile);
+        const fetchedCsvFile = await fetchGoogleSheetAsCSV(state.googleSheetLink);
+        setState({ ...state, csvFile: fetchedCsvFile });
         await uploadFile(fetchedCsvFile);
       } catch (error) {
         setToastMessage(error.message);
       } finally {
-        setIsRefreshing(false);
+        setState({ ...state, isRefreshing: false });
       }
     }
   };
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-    setGoogleSheetLink("");
-    setUploadedImage(null);
-    setError(null);
-    setCsvFile(null);
+    setState({
+      ...state,
+      file: e.target.files[0],
+      googleSheetLink: "",
+      uploadedImage: null,
+      error: null,
+      csvFile: null,
+    });
     stopRefreshTimer();
   };
 
   const handleGoogleSheetLinkChange = (e) => {
-    setGoogleSheetLink(e.target.value);
-    setFile(null);
-    setCsvFile(null);
+    setState({
+      ...state,
+      googleSheetLink: e.target.value,
+      file: null,
+      csvFile: null,
+    });
     stopRefreshTimer();
   };
 
@@ -101,28 +109,28 @@ export default function UploadFile() {
   };
 
   const handleUpload = async () => {
-    if (!file && !googleSheetLink) {
+    if (!state.file && !state.googleSheetLink) {
       setToastMessage("Please upload a file or provide a valid Google Sheet link.");
       return;
     }
 
-    if (googleSheetLink && !csvFile) {
+    if (state.googleSheetLink && !state.csvFile) {
       try {
-        const fetchedCsvFile = await fetchGoogleSheetAsCSV(googleSheetLink);
-        setCsvFile(fetchedCsvFile);
+        const fetchedCsvFile = await fetchGoogleSheetAsCSV(state.googleSheetLink);
+        setState({ ...state, csvFile: fetchedCsvFile });
         await uploadFile(fetchedCsvFile);
       } catch (error) {
         setToastMessage(error.message);
         return;
       }
     } else {
-      await uploadFile(file || csvFile);
+      await uploadFile(state.file || state.csvFile);
     }
   };
 
   const uploadFile = async (fileToUpload) => {
     setIsUploading(true);
-    setError(null);
+    setState({ ...state, error: null });
     const formData = new FormData();
     formData.append("file", fileToUpload);
 
@@ -145,12 +153,12 @@ export default function UploadFile() {
       // Create a blob URL from the response data
       const blob = new Blob([response.data], { type: "image/png" });
       const imageUrl = URL.createObjectURL(blob);
-      setUploadedImage(imageUrl);
+      setState({ ...state, uploadedImage: imageUrl });
 
       console.log("File uploaded successfully");
     } catch (error) {
       console.error("Error uploading file:", error);
-      setError("Failed to upload file. Please try again.");
+      setState({ ...state, error: "Failed to upload file. Please try again." });
       setToastMessage("Failed to upload file. Please try again.");
     } finally {
       setIsUploading(false);
@@ -158,9 +166,9 @@ export default function UploadFile() {
   };
 
   const handleDownload = () => {
-    if (uploadedImage) {
+    if (state.uploadedImage) {
       const link = document.createElement("a");
-      link.href = uploadedImage;
+      link.href = state.uploadedImage;
       link.download = "visualization.png";
       document.body.appendChild(link);
       link.click();
@@ -169,12 +177,14 @@ export default function UploadFile() {
   };
 
   const handleReset = () => {
-    setFile(null);
-    setGoogleSheetLink("");
-    setUploadedImage(null);
-    setError(null);
-    setToastMessage(null);
-    setCsvFile(null);
+    setState({
+      file: null,
+      googleSheetLink: "",
+      uploadedImage: null,
+      error: null,
+      csvFile: null,
+      isRefreshing: false,
+    });
     stopRefreshTimer(); // Stop the refresh timer
     setRefreshTimer(10); // Reset the timer
   };
@@ -197,7 +207,7 @@ export default function UploadFile() {
               <label
                 htmlFor="dropzone-file"
                 className={`flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 ${
-                  googleSheetLink ? "opacity-50 cursor-not-allowed" : ""
+                  state.googleSheetLink ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
@@ -230,11 +240,13 @@ export default function UploadFile() {
                   className="hidden"
                   onChange={handleFileChange}
                   accept=".csv,.xlsx"
-                  disabled={!!googleSheetLink}
+                  disabled={!!state.googleSheetLink}
                 />
               </label>
             </div>
-            {file && <p className="mt-4 text-sm text-gray-600">Uploaded file: {file.name}</p>}
+            {state.file && (
+              <p className="mt-4 text-sm text-gray-600">Uploaded file: {state.file.name}</p>
+            )}
 
             {/* Google Sheet Link Section */}
             <div className="flex flex-col items-center justify-center w-full mb-6">
@@ -254,16 +266,16 @@ export default function UploadFile() {
                 type="text"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md"
                 placeholder="Eg: https://docs.google.com/spreadsheets/d/..."
-                value={googleSheetLink}
+                value={state.googleSheetLink}
                 onChange={handleGoogleSheetLinkChange}
-                disabled={!!file}
+                disabled={!!state.file}
               />
             </div>
 
             <div className="flex space-x-4">
               <button
                 onClick={handleUpload}
-                disabled={isUploading || (!file && !googleSheetLink)}
+                disabled={isUploading || (!state.file && !state.googleSheetLink)}
                 className="w-full px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isUploading ? (
@@ -296,7 +308,7 @@ export default function UploadFile() {
               </button>
               <button
                 onClick={handleReset}
-                disabled={!file && !googleSheetLink && !uploadedImage}
+                disabled={!state.file && !state.googleSheetLink && !state.uploadedImage}
                 className="w-full px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Reset
@@ -305,10 +317,10 @@ export default function UploadFile() {
           </div>
         </div>
 
-        {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+        {state.error && <p className="mt-4 text-sm text-red-600">{state.error}</p>}
       </div>
 
-      {uploadedImage && (
+      {state.uploadedImage && (
         <div className="mt-0 w-full bg-white shadow-lg">
           <div className="max-w-screen-2xl mx-auto relative">
             <div className=" right-0 z-10">
@@ -319,13 +331,13 @@ export default function UploadFile() {
                 Download Image
               </button>
             </div>
-            <img src={uploadedImage} alt="Uploaded Image" className="w-full h-auto" />
+            <img src={state.uploadedImage} alt="Uploaded Image" className="w-full h-auto" />
           </div>
         </div>
       )}
 
       {/* Timer */}
-      {csvFile && (
+      {state.csvFile && (
         <div className="fixed bottom-4 left-4 bg-blue-600 text-white px-4 py-2 rounded-md shadow-lg">
           Refreshing in {refreshTimer} seconds...
         </div>
@@ -342,7 +354,7 @@ export default function UploadFile() {
       )}
 
       {/* Full-Screen Loader */}
-      {isRefreshing && (
+      {state.isRefreshing && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
           <div className="flex flex-col items-center">
             <div className="animate-spin border-8 border-t-8 border-white rounded-full h-24 w-24"></div>
