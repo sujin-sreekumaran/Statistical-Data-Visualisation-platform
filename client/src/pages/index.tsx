@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Inter } from "next/font/google";
+
 // Initialize the Inter font
 const inter = Inter({ subsets: ["latin"] });
 

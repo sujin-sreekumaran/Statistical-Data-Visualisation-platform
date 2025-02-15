@@ -1,22 +1,29 @@
-import { useState } from "react";
+import { useState, FormEvent, ChangeEvent } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
 import { signIn, getSession } from "next-auth/react";
+import { GetServerSideProps } from "next";
+
+interface Errors {
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+}
 
 export default function Login() {
   const [isSignIn, setIsSignIn] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<Errors>({});
   const [loginError, setLoginError] = useState("");
   const router = useRouter();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setErrors({});
     setLoginError("");
-    const newErrors = {};
+    const newErrors: Errors = {};
 
     if (!validateEmail(email)) {
       newErrors.email = "Please enter a valid email address";
@@ -54,19 +61,19 @@ export default function Login() {
     }
   };
 
-  const handleEmailChange = (e) => {
+  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
     setErrors((prev) => ({ ...prev, email: "" }));
     setLoginError("");
   };
 
-  const handlePasswordChange = (e) => {
+  const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
     setErrors((prev) => ({ ...prev, password: "" }));
     setLoginError("");
   };
 
-  const handleConfirmPasswordChange = (e) => {
+  const handleConfirmPasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
     setConfirmPassword(e.target.value);
     setErrors((prev) => ({ ...prev, confirmPassword: "" }));
   };
@@ -80,12 +87,12 @@ export default function Login() {
     }
   };
 
-  const validateEmail = (email) => {
+  const validateEmail = (email: string) => {
     const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return re.test(String(email).toLowerCase());
   };
 
-  const validatePassword = (password) => {
+  const validatePassword = (password: string) => {
     const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     return re.test(password);
   };
@@ -250,7 +257,7 @@ export default function Login() {
   );
 }
 
-export async function getServerSideProps(context) {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
 
   if (session) {
@@ -265,4 +272,4 @@ export async function getServerSideProps(context) {
   return {
     props: {},
   };
-}
+};

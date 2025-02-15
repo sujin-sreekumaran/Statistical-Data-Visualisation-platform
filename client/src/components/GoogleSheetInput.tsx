@@ -1,6 +1,16 @@
 import React from "react";
 
-const GoogleSheetInput = ({ googleSheetLink, handleGoogleSheetLinkChange, file }) => {
+interface GoogleSheetInputProps {
+  googleSheetLink: string;
+  handleGoogleSheetLinkChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  file: File | null;
+}
+
+const GoogleSheetInput: React.FC<GoogleSheetInputProps> = ({
+  googleSheetLink,
+  handleGoogleSheetLinkChange,
+  file,
+}) => {
   return (
     <div className="flex flex-col items-center justify-center w-full mb-6">
       <label

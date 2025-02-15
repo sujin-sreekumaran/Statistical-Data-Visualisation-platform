@@ -1,11 +1,12 @@
 import NextAuth from "next-auth";
+import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
-export default NextAuth({
+const options: NextAuthOptions = {
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
   callbacks: {
@@ -16,10 +17,14 @@ export default NextAuth({
       }
       return token;
     },
-    async session({ session, token, user }) {
+    async session({ session, token }) {
+      // Type assertion to ensure token is of the correct type
+      const typedToken = token as { accessToken?: string };
       // Send properties to the client, like an access_token from a provider.
-      session.accessToken = token.accessToken;
+      session.accessToken = typedToken.accessToken;
       return session;
     },
   },
-});
+};
+
+export default NextAuth(options);

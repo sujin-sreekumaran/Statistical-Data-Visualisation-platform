@@ -1,6 +1,15 @@
 import React from "react";
 
-const UploadButton = ({
+interface UploadButtonProps {
+  handleUpload: () => void;
+  isUploading: boolean;
+  handleReset: () => void;
+  file: File | null;
+  googleSheetLink: string;
+  uploadedImage: string | null;
+}
+
+const UploadButton: React.FC<UploadButtonProps> = ({
   handleUpload,
   isUploading,
   handleReset,

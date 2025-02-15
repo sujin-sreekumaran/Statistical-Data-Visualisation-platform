@@ -1,6 +1,11 @@
 import { signOut } from "next-auth/react";
+import React from "react";
 
-export default function Navbar({ onLogout }) {
+interface NavbarProps {
+  onLogout: () => void;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
   const handleLogout = async () => {
     onLogout();
     await signOut({ callbackUrl: "/login" });
@@ -14,7 +19,7 @@ export default function Navbar({ onLogout }) {
           <div className="flex">
             {/* Add logo or site name */}
             <div className="flex-shrink-0 flex items-center">
-              <span className="text-xl font-bold">Data visualisation Platform</span>
+              <span className="text-xl font-bold">Data Visualisation Platform</span>
             </div>
           </div>
           <div className="flex items-center">
@@ -29,4 +34,6 @@ export default function Navbar({ onLogout }) {
       </div>
     </nav>
   );
-}
+};
+
+export default Navbar;

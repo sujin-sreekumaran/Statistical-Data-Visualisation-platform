@@ -1,6 +1,11 @@
 import React from "react";
 
-const FileInput = ({ handleFileChange, googleSheetLink }) => {
+interface FileInputProps {
+  handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  googleSheetLink: string;
+}
+
+const FileInput: React.FC<FileInputProps> = ({ handleFileChange, googleSheetLink }) => {
   return (
     <div className="flex items-center justify-center w-full mb-6">
       <label

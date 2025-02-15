@@ -7,8 +7,17 @@ import GoogleSheetInput from "../components/GoogleSheetInput";
 import UploadButton from "../components/UploadButton";
 import Modal from "../components/Modal";
 
+interface State {
+  file: File | null;
+  googleSheetLink: string;
+  uploadedImage: string | null;
+  error: string | null;
+  csvFile: File | null;
+  isRefreshing: boolean;
+}
+
 export default function UploadFile() {
-  const [state, setState] = useState({
+  const [state, setState] = useState<State>({
     file: null,
     googleSheetLink: "",
     uploadedImage: null,
@@ -17,11 +26,11 @@ export default function UploadFile() {
     isRefreshing: false,
   });
   const [isUploading, setIsUploading] = useState(false);
-  const [toastMessage, setToastMessage] = useState(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [refreshTimer, setRefreshTimer] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [columns, setColumns] = useState([]);
-  const refreshInterval = useRef(null);
+  const [columns, setColumns] = useState<string[]>([]);
+  const refreshInterval = useRef<NodeJS.Timeout | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -68,17 +77,21 @@ export default function UploadFile() {
         setState({ ...state, csvFile: fetchedCsvFile });
         await uploadFile(fetchedCsvFile);
       } catch (error) {
-        setToastMessage(error.message);
+        if (error instanceof Error) {
+          setToastMessage(error.message);
+        } else {
+          setToastMessage("An unknown error occurred.");
+        }
       } finally {
         setState({ ...state, isRefreshing: false });
       }
     }
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setState({
       ...state,
-      file: e.target.files[0],
+      file: e.target.files ? e.target.files[0] : null,
       googleSheetLink: "",
       uploadedImage: null,
       error: null,
@@ -87,7 +100,7 @@ export default function UploadFile() {
     stopRefreshTimer();
   };
 
-  const handleGoogleSheetLinkChange = (e) => {
+  const handleGoogleSheetLinkChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setState({
       ...state,
       googleSheetLink: e.target.value,
@@ -97,7 +110,7 @@ export default function UploadFile() {
     stopRefreshTimer();
   };
 
-  const fetchGoogleSheetAsCSV = async (link) => {
+  const fetchGoogleSheetAsCSV = async (link: string): Promise<File> => {
     try {
       const sheetIdMatch = link.match(/\/d\/([a-zA-Z0-9-_]+)/);
       if (!sheetIdMatch) {
@@ -126,35 +139,39 @@ export default function UploadFile() {
         setState({ ...state, csvFile: fetchedCsvFile });
         await uploadFile(fetchedCsvFile);
       } catch (error) {
-        setToastMessage(error.message);
+        if (error instanceof Error) {
+          setToastMessage(error.message);
+        } else {
+          setToastMessage("An unknown error occurred.");
+        }
         return;
       }
     } else {
       const fileToUpload = state.file || state.csvFile;
       const reader = new FileReader();
       reader.onload = (e) => {
-        const text = e.target.result;
+        const text = e.target?.result as string;
         const csvData = text.split("\n")[0].split(",");
         setColumns(csvData);
         setIsModalOpen(true);
       };
-      reader.readAsText(fileToUpload);
+      reader.readAsText(fileToUpload as Blob);
     }
   };
 
-  const handleColumnDelete = (col) => {
+  const handleColumnDelete = (col: string) => {
     setColumns(columns.filter((column) => column !== col));
   };
 
-  const handleSubmit = async (editedColumns) => {
+  const handleSubmit = async (editedColumns: string[]) => {
     setIsModalOpen(false);
     const fileToUpload = state.file || state.csvFile;
     const reader = new FileReader();
     reader.onload = async (e) => {
-      const text = e.target.result;
+      const text = e.target?.result as string;
       const rows = text.split("\n");
       const header = rows[0].split(",");
-      const columnMap = header.reduce((acc, col, index) => {
+      const columnMap = header.reduce((acc: { [key: number]: string }, col, index) => {
         const newCol = editedColumns[index];
         if (newCol) {
           acc[index] = newCol;
@@ -174,14 +191,16 @@ export default function UploadFile() {
 
       console.log(filteredRows);
 
-      const blob = new Blob([filteredRows], { type: fileToUpload.type });
-      const newFile = new File([blob], fileToUpload.name, { type: fileToUpload.type });
+      const blob = new Blob([filteredRows], { type: fileToUpload?.type });
+      const newFile = new File([blob], fileToUpload?.name || "file.csv", {
+        type: fileToUpload?.type,
+      });
       await uploadFile(newFile);
     };
-    reader.readAsText(fileToUpload);
+    reader.readAsText(fileToUpload as Blob);
   };
 
-  const uploadFile = async (fileToUpload) => {
+  const uploadFile = async (fileToUpload: File) => {
     setIsUploading(true);
     setState({ ...state, error: null });
     const formData = new FormData();
@@ -211,8 +230,13 @@ export default function UploadFile() {
       console.log("File uploaded successfully");
     } catch (error) {
       console.error("Error uploading file:", error);
-      setState({ ...state, error: "Failed to upload file. Please try again." });
-      setToastMessage("Failed to upload file. Please try again.");
+      if (error instanceof Error) {
+        setState({ ...state, error: error.message });
+        setToastMessage(error.message);
+      } else {
+        setState({ ...state, error: "Failed to upload file. Please try again." });
+        setToastMessage("Failed to upload file. Please try again.");
+      }
     } finally {
       setIsUploading(false);
     }

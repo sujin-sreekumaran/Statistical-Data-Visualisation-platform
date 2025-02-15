@@ -1,13 +1,27 @@
 import React, { useState, useEffect } from "react";
 
-const Modal = ({ isOpen, onClose, columns, handleColumnDelete, handleSubmit }) => {
-  const [editedColumns, setEditedColumns] = useState(columns);
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  columns: string[];
+  handleColumnDelete: (col: string) => void;
+  handleSubmit: (editedColumns: string[]) => void;
+}
+
+const Modal: React.FC<ModalProps> = ({
+  isOpen,
+  onClose,
+  columns,
+  handleColumnDelete,
+  handleSubmit,
+}) => {
+  const [editedColumns, setEditedColumns] = useState<string[]>(columns);
 
   useEffect(() => {
     setEditedColumns(columns);
   }, [columns]);
 
-  const handleColumnEdit = (index, newName) => {
+  const handleColumnEdit = (index: number, newName: string) => {
     const updatedColumns = [...editedColumns];
     updatedColumns[index] = newName;
     setEditedColumns(updatedColumns);
@@ -27,7 +41,7 @@ const Modal = ({ isOpen, onClose, columns, handleColumnDelete, handleSubmit }) =
         <table className="min-w-full bg-white">
           <thead>
             <tr>
-              <th className="py-2 px-4 border-b text-left">columns</th>
+              <th className="py-2 px-4 border-b text-left">Column Name</th>
               <th className="py-2 px-4 border-b text-left">Actions</th>
             </tr>
           </thead>
