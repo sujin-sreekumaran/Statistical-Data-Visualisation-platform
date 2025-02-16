@@ -262,7 +262,7 @@ export default function UploadFile() {
       csvFile: null,
       isRefreshing: false,
     });
-    stopRefreshTimer(); // Stop the refresh timer
+    stopRefreshTimer(); // Stop the timer
     setRefreshTimer(10); // Reset the timer
   };
 

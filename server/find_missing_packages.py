@@ -43,7 +43,7 @@ installed_packages = get_installed_packages()
 requirements = get_requirements()
 
 # Find missing packages
-missing_packages = project_imports - requirements - set(['flask', 'werkzeug'])  # Exclude Flask and Werkzeug as they're usually part of the framework
+missing_packages = project_imports - requirements - set(['flask', 'werkzeug'])  
 missing_packages = {pkg for pkg in missing_packages if pkg in installed_packages}
 
 if missing_packages:

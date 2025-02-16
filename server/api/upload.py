@@ -1,6 +1,6 @@
 import logging
 import matplotlib
-matplotlib.use('Agg') # Set the backend to 'Agg' to avoid GUI issues
+matplotlib.use('Agg') 
 
 from flask import Blueprint, request, send_file
 import pandas as pd
@@ -12,7 +12,6 @@ from .visualizations import visualizations
 
 upload_bp = Blueprint('upload', __name__)
 
-# Configure logging
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
 
@@ -28,7 +27,6 @@ def upload_file():
         return 'Invalid file format', 400
 
     try:
-        # Create visualizations in a single column layout
         fig, axes = plt.subplots(5, 1, figsize=(16, 30)) 
        
         for i, (name, func) in enumerate(visualizations.items()):

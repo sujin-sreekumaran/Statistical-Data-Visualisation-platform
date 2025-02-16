@@ -7,7 +7,6 @@ from config import Config
 
 auth_bp = Blueprint('auth', __name__)
 
-# MongoDB configuration
 client = MongoClient(Config.MONGODB_URI)
 db = client[Config.MONGODB_DB]
 users = db.users
