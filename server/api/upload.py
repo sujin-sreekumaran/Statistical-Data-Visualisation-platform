@@ -20,7 +20,6 @@ logger = logging.getLogger(__name__)
 def upload_file():
     file = request.files['file']
     
-    # Determine whether it's CSV or Excel
     if file.filename.endswith('.csv'):
         df = pd.read_csv(file)
     elif file.filename.endswith('.xlsx'):
@@ -30,10 +29,8 @@ def upload_file():
 
     try:
         # Create visualizations in a single column layout
-        fig, axes = plt.subplots(4, 1, figsize=(16, 24)) 
-        # Increased width to 16 for better fit
-        
-        # Apply visualizations
+        fig, axes = plt.subplots(5, 1, figsize=(16, 30)) 
+       
         for i, (name, func) in enumerate(visualizations.items()):
             func(df, axes[i])
         
