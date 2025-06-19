@@ -1,8 +1,9 @@
-Flask==2.0.1
-Flask-CORS==3.1.2
-pandas==1.5.3
-matplotlib==3.7.1
-seaborn==0.12.2
-scipy==1.11.2sc
-bcrypt==4.2.0
-pymongo==3.11.0
+Flask
+Flask-CORS
+pandas
+matplotlib
+seaborn
+scipy
+bcrypt
+pymongo
+python-dotenv

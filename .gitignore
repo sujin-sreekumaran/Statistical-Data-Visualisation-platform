@@ -5,8 +5,9 @@ server/.env
 client/.env
 
 # Ignore Python cache files
-__pycache__/
-*.pyc
+server/__pycache__/
+server/*.pyc
+server/venv/
 
 # Ignore other files and directories as needed
 node_modules/
