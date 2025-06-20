@@ -260,6 +260,27 @@ export default function UploadFile() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-200 relative">
+      {/* About This Project Section */}
+      <section className="w-full flex justify-center py-10 bg-gray-100 mb-8 shadow-lg">
+        <div className="max-w-3xl px-6 text-center">
+          <h2 className="text-4xl font-extrabold text-black mb-4">
+            Statistical Data Visualisation Platform
+          </h2>
+          <p className="text-lg text-black mb-2 font-medium">
+            This product is a user-friendly web application that allows you to upload CSV, Excel
+            files, or Google Sheet links and instantly generate beautiful, insightful data
+            visualizations.
+          </p>
+          <p className="text-md text-black">
+            Powered by <span className="font-bold">Python</span>,{" "}
+            <span className="font-bold">Flask</span>, and modern{" "}
+            <span className="font-bold">JavaScript</span>, this platform helps you explore your data
+            visually—no coding required. Upload your data, customize columns, and download
+            high-quality charts in seconds!
+          </p>
+        </div>
+      </section>
+
       <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="bg-white shadow-lg rounded-lg overflow-hidden">
           <div className="px-6 py-8">
@@ -294,17 +315,21 @@ export default function UploadFile() {
       </div>
 
       {state.uploadedImage && (
-        <div className="mt-0 w-full bg-white shadow-lg">
-          <div className="max-w-screen-2xl mx-auto relative">
-            <div className=" right-0 z-10">
-              <button
-                onClick={handleDownload}
-                className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-              >
-                Download Image
-              </button>
-            </div>
-            <img src={state.uploadedImage} alt="Uploaded Image" className="w-full h-auto" />
+        <div className="mt-0 w-full bg-white shadow-lg flex flex-col items-center py-8">
+          <div className="max-w-screen-2xl mx-auto relative w-full flex flex-col items-center">
+            <img
+              src={state.uploadedImage}
+              alt="Uploaded Image"
+              className="w-full max-w-6xl h-auto rounded-lg shadow-md mb-6"
+              style={{ minHeight: "600px" }}
+            />
+            <button
+              onClick={handleDownload}
+              className="px-8 py-3 text-lg font-semibold rounded-md text-white bg-green-600 hover:bg-blue-700 shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300"
+              style={{ marginTop: "1rem" }}
+            >
+              ⬇️ Download Image
+            </button>
           </div>
         </div>
       )}

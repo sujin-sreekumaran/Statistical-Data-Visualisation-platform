@@ -40,16 +40,33 @@ def create_box_plot(df, ax):
         sns.boxplot(data=numeric_df, ax=ax)
         ax.set_title('Box Plot')
 
-def create_pair_plot(df, ax):
-    numeric_df = df.select_dtypes(include=(['number']))
+def create_scatter_plot(df, ax):
+    numeric_df = df.select_dtypes(include=['number'])
     if not numeric_df.empty and numeric_df.shape[1] > 1:
-        sns.pairplot(numeric_df)
-        ax.set_title('Pair Plot')
+        x = numeric_df.columns[0]
+        y = numeric_df.columns[1]
+        sns.scatterplot(x=numeric_df[x], y=numeric_df[y], ax=ax)
+        ax.set_xlabel(x)
+        ax.set_ylabel(y)
+        ax.set_title('Scatter Plot')
 
-visualizations = {
+def create_bar_plot(df, ax):
+    # Use the first column as categories and the second as values if possible
+    if df.shape[1] > 1:
+        x = df.columns[0]
+        y = df.columns[1]
+        sns.barplot(x=df[x], y=df[y], ax=ax)
+        ax.set_xlabel(x)
+        ax.set_ylabel(y)
+        ax.set_title('Bar Plot')
+
+default_visualizations = {
     'statistical_measures': create_statistical_measures_plot,
     'curve_plot': create_curve_plot,
     'histogram': create_histogram,
     'box_plot': create_box_plot,
-    'pair_plot': create_pair_plot
+    'scatter_plot': create_scatter_plot,
+    'bar_plot': create_bar_plot
 }
+
+visualizations = default_visualizations

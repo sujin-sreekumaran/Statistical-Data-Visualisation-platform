@@ -27,8 +27,10 @@ def upload_file():
         return 'Invalid file format', 400
 
     try:
-        fig, axes = plt.subplots(5, 1, figsize=(16, 30)) 
-       
+        num_plots = len(visualizations)
+        fig, axes = plt.subplots(num_plots, 1, figsize=(16, 6 * num_plots))
+        if num_plots == 1:
+            axes = [axes]
         for i, (name, func) in enumerate(visualizations.items()):
             func(df, axes[i])
         

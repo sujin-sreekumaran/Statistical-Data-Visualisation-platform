@@ -6,6 +6,7 @@ client/.env
 
 # Ignore Python cache files
 server/__pycache__/
+server/api/__pycache__/
 server/*.pyc
 server/venv/
 
