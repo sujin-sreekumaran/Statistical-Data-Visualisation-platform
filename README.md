@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project is a web application that allows users to upload CSV or Excel files, which are then processed on the server-side using Python Flask. The processed data is visualized and displayed to the user. The front end is built using Next.js and Node.js.
+This project is a web application that allows users to upload CSV, Excel files, or Google Sheet links, which are then processed on the server-side using Python Flask. The processed data is visualized and displayed to the user. The front end is built using Next.js and Node.js.
 
 ## File Structure
 
@@ -14,7 +14,6 @@ project-root/
 │ ├── public/ # Public static files
 │ ├── styles/ # CSS styles
 │ ├── components/ # React components
-│ └── .gitignore # Git ignore file
 │ └── package.json # Node.js dependencies and scripts
 │
 ├── server/ # Backend directory
@@ -29,23 +28,9 @@ project-root/
 
 ### Frontend Setup
 
-#### Navigate to the Client Directory\*\*:
-
 ```bash
 cd client
-```
-
-#### Install Dependencies:
-
-Ensure you have Node.js v18.17.0 or later installed. Run:
-
-```bash
 npm install
-```
-
-#### Run the Development Server:
-
-```bash
 npm run dev
 ```
 
@@ -53,53 +38,41 @@ The application will be available at http://localhost:3000.
 
 ### Backend Setup
 
-#### Navigate to the Server Directory:
-
 ```bash
 cd server
-```
-
-#### Set Up a Virtual Environment (optional but recommended)::
-
-Ensure you have Python 3.8 or later installed. Run:
-
-```bash
 python -m venv venv
 source venv/bin/activate
-```
-
-#### Install Dependencies:
-
-```bash
 pip install -r requirements.txt
-```
-
-#### Run the Flask Application:
-
-```bash
 python app.py
 ```
 
-    The Flask application will be available at http://localhost:5000.
+The Flask application will be available at http://localhost:5000.
 
 ## Project Description
 
-### Frontend:
+### Frontend
 
-    •	The frontend is built with Next.js and is responsible for providing a user interface where users can upload CSV or Excel files.
-    •	Upon file upload, the frontend sends a POST request to the backend with the file.
+- Built with Next.js and React.
+- Provides a user interface for uploading CSV, Excel files, or Google Sheet links.
+- Sends uploaded data to the backend and displays the returned visualizations.
 
-### Backend:
+### Backend
 
-    •	The backend is built with Flask and processes the uploaded files.
-    •	It reads the file, performs data analysis, and generates visualizations (Curve Plot, Boxplot, Moments, and Heatmap).
-    •	The visualizations are returned as images to the frontend.
+- Built with Flask.
+- Processes uploaded files, performs data analysis, and generates visualizations.
+- Returns the visualizations as a single image to the frontend.
 
-### Visualizations:
+### Visualizations
 
-    •	Curve Plot: Shows a line plot for the first numeric column.
-    •	Boxplot: Displays the distribution of data through boxplots for numeric columns.
-    •	Moments Plot: Visualizes statistical moments including mean, variance, skewness, and kurtosis.
-    •	Heatmap: Shows the correlation matrix of numeric columns.
+The backend generates the following professional and widely used visualizations:
 
+- **Statistical Measures Table**: Shows summary statistics (mean, std, median, etc.) for numeric columns.
+- **Curve Plot**: Line plot for the first numeric column.
+- **Histogram**: Distribution of the first numeric column.
+- **Box Plot**: Distribution of all numeric columns.
+- **Scatter Plot**: Relationship between the first two numeric columns.
+- **Bar Plot**: Bar chart using the first column as categories and the second as values.
 
+---
+
+This platform helps you explore your data visually—no coding required. Upload your data, customize columns, and download high-quality charts in seconds.
