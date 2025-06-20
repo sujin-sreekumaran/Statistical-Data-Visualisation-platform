@@ -203,7 +203,7 @@ export default function UploadFile() {
 
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_LOCAL_URL}/api/upload`,
+        `https://statistical-data-visualisation-platform.onrender.com/api/upload`,
         formData,
         {
           headers: {
