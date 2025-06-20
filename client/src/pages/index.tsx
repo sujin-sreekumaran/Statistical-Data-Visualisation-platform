@@ -199,16 +199,12 @@ export default function UploadFile() {
     formData.append("file", fileToUpload);
 
     try {
-      console.log("Uploading file...");
-
-      const token = localStorage.getItem("token");
       const response = await axios.post(
         `https://statistical-data-visualisation-platform.onrender.com/api/upload`,
         formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
           },
           responseType: "blob",
         }
