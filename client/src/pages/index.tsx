@@ -181,8 +181,6 @@ export default function UploadFile() {
         })
         .join("\n");
 
-      console.log(filteredRows);
-
       const blob = new Blob([filteredRows], { type: fileToUpload?.type });
       const newFile = new File([blob], fileToUpload?.name || "file.csv", {
         type: fileToUpload?.type,
@@ -214,8 +212,6 @@ export default function UploadFile() {
       const blob = new Blob([response.data], { type: "image/png" });
       const imageUrl = URL.createObjectURL(blob);
       setState({ ...state, uploadedImage: imageUrl });
-
-      console.log("File uploaded successfully");
     } catch (error) {
       console.error("Error uploading file:", error);
       if (error instanceof Error) {
